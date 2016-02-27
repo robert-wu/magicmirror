@@ -26,15 +26,12 @@ var history = createHistory({
   queryKey: false
 });
 
-import {load} from './api'
-load(function start() {
-  ReactDOM.render(
-    <Provider store={store}>
-      <Router history={history}>
-        <Route component={App}>
-        </Route>
-      </Router>
-    </Provider>,
-    document.getElementById('content')
-  );
-});
+ReactDOM.render(
+	<Provider store={store}>
+		<Router history={history}>
+			<Route component={App}>
+			</Route>
+		</Router>
+	</Provider>,
+	document.getElementById('content')
+);
