@@ -1,15 +1,22 @@
 #!/usr/bin/env node
 var WebSocketServer = require('websocket').server;
 var http = require('http');
- 
+var Forecast = require('forecast.io');
+
 var bigDatas = new Array();
+
+var options = {
+    APIKey: "87ec4bf1fc35459c03dba26ce116fd5b",
+    timeout: 2500
+},
+forecast = new Forecast(options);
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
-server.listen(8086, function() {
+server.listen(8087, function() {
     console.log((new Date()) + ' Server is listening on port 8080');
 });
 
@@ -73,3 +80,14 @@ wsServer.on('request', function(request) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });
+
+var wait = setInterval(function() {
+    forecast.get(34.137260, -118.128216, function (err, res, data) {
+        console.log("calledFor")
+        if (err) console.log("timeout");
+        console.log('res: ' + res);
+        console.log('data: ' + data);
+        bigDatas['forcast']=["currently"]["summary"];
+        console.log(data["currently"]["summary"]);
+    });
+}, 180000); // retry every 3 mins
