@@ -34,7 +34,7 @@ class App extends Component {
       <StyleRoot>
         <div style={{width: '100%', height: '100%'}}>
           <AppBar
-            title="Scout"
+            title="MagicMirror"
             iconClassNameRight="muidocs-icon-navigation-expand-more"
             onLeftIconButtonTouchTap={this._toggleNav.bind(this)}
           />

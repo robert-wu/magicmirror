@@ -21,6 +21,7 @@ const store = configureStore();
 window.store = store;
 
 import App from './components/App'
+import Mirror from './components/Mirror'
 
 var history = createHistory({
   queryKey: false
@@ -30,6 +31,7 @@ ReactDOM.render(
 	<Provider store={store}>
 		<Router history={history}>
 			<Route component={App}>
+				<Route component={Mirror} path="/" />
 			</Route>
 		</Router>
 	</Provider>,
