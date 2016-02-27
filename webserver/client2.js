@@ -7,6 +7,10 @@ client.on('connectFailed', function(error) {
     console.log('Connect Error: ' + error.toString());
 });
  
+client.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
+
 client.on('connect', function(connection) {
     console.log('WebSocket Client Connected');
     connection.on('error', function(error) {
@@ -24,11 +28,11 @@ client.on('connect', function(connection) {
     function sendNumber() {
         if (connection.connected) {
             var number = Math.round(Math.random() * 0xFFFFFF);
-            connection.sendUTF('web-'+'number,swag,pizza');
+            connection.sendUTF('web-'+'number,forcast,pizza,swag');
             setTimeout(sendNumber, 1000);
         }
     }
     sendNumber();
 });
  
-client.connect('ws://localhost:8091/', 'echo-protocol');
+client.connect('ws://172.20.10.12:8091/', 'echo-protocol');
