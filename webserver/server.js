@@ -6,6 +6,7 @@ var app = require('express')();
 var http1 = require('http').Server(app);
 var io = require('socket.io')(http1);
 var express = require('express');
+var dispatcher = require('httpdispatcher');
 
 var bigDatas = new Array();
 
@@ -17,10 +18,20 @@ forecast = new Forecast(options);
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
+    var strData= request.url.substring(2,request.url.length)
+    var choices=strData.split('&');
+    out='';
+    for(var i=0;i<choices.length;i++){
+        var parts=choices[i].split('=')
+        out+=parts[0]+'='+bigDatas[choices[i]];
+        if(i!=choices.length-1){
+            out+=',';
+        }
+    }
     response.writeHead(404);
-    response.end();
+    response.end(out);
 });
-server.listen(8091, function() {
+server.listen(8092, function() {
     console.log((new Date()) + ' Server is listening on port 8080');
 });
 
@@ -66,6 +77,7 @@ io.on('connection', function(socket){
     }
   });
 });
+   
 
 wsServer.on('request', function(request) {
     if (!originIsAllowed(request.origin)) {
@@ -113,7 +125,7 @@ wsServer.on('request', function(request) {
     });
 });
 
-http1.listen(3002, function(){
+http1.listen(3003, function(){
   console.log('listening on *:3001');
 });
 
@@ -126,6 +138,31 @@ forecast.get(34.137260, -118.128216, function (err, res, data) {
     console.log(data["currently"]["summary"]);
 });
 
+http.get({
+    host: 'query.yahooapis.com',
+    path: '/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22GOOG,YHOO,MSFT%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
+}, function(response) {
+    // Continuously update stream with data
+    var body = '';
+    response.on('data', function(d) {
+        body += d;
+    });
+    response.on('end', function() {
+        //console.log(body);
+        // Data reception is done, do whatever with it!
+        var parsed = JSON.parse(body);
+        var table=parsed['query']['results']['quote'];
+        //console.log(table);
+        var out='(';
+        for(var i=0;i<table.length;i++){
+            out+=table[i]['symbol']+','+table[i]['Ask']+','+table[i]['ChangeinPercent']+';'
+        }
+        out+=')';
+        bigDatas['stock']=out;
+        console.log(bigDatas['stock']);
+    });
+});
+
 var wait = setInterval(function() {
     forecast.get(34.137260, -118.128216, function (err, res, data) {
         //console.log("calledFor")
@@ -134,5 +171,27 @@ var wait = setInterval(function() {
         //console.log('data: ' + data);
         bigDatas['forcast']=data["currently"]["summary"];
         console.log(data["currently"]["summary"]);
+    });
+    http.get({
+        host: 'query.yahooapis.com',
+        path: '/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22GOOG,YHOO%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
+    }, function(response) {
+        // Continuously update stream with data
+        var body = '';
+        response.on('data', function(d) {
+            body += d;
+        });
+        response.on('end', function() {
+            var parsed = JSON.parse(body);
+            var table=parsed['query']['results']['quote'];
+            //console.log(table);
+            var out='(';
+            for(var i=0;i<table.length;i++){
+                out+=table[i]['symbol']+','+table[i]['Ask']+','+table[i]['ChangeinPercent']+';'
+            }
+            out+=')';
+            bigDatas['stock']=out;
+            console.log(bigDatas['stock']);
+        });
     });
 }, 180000); // retry every 3 mins
