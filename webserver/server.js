@@ -16,7 +16,7 @@ var server = http.createServer(function(request, response) {
     response.writeHead(404);
     response.end();
 });
-server.listen(8087, function() {
+server.listen(8090, function() {
     console.log((new Date()) + ' Server is listening on port 8080');
 });
 
@@ -81,12 +81,21 @@ wsServer.on('request', function(request) {
     });
 });
 
+forecast.get(34.137260, -118.128216, function (err, res, data) {
+    //console.log("calledFor")
+    if (err) console.log("timeout");
+    //console.log('res: ' + res);
+    //console.log('data: ' + data);
+    bigDatas['forcast']=["currently"]["summary"];
+    console.log(data["currently"]["summary"]);
+});
+
 var wait = setInterval(function() {
     forecast.get(34.137260, -118.128216, function (err, res, data) {
-        console.log("calledFor")
+        //console.log("calledFor")
         if (err) console.log("timeout");
-        console.log('res: ' + res);
-        console.log('data: ' + data);
+        //console.log('res: ' + res);
+        //console.log('data: ' + data);
         bigDatas['forcast']=["currently"]["summary"];
         console.log(data["currently"]["summary"]);
     });
