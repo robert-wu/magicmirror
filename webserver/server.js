@@ -5,7 +5,7 @@ var app = require('express')();
 var http1 = require('http').Server(app);
 var io = require('socket.io')(http1);
 
-var PORT=3006;
+var PORT=3007;
 
 var bigDatas = new Array();
 
