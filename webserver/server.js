@@ -18,19 +18,19 @@ forecast = new Forecast(options);
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
-    var strData= request.url.substring(2,request.url.length)
-    var choices=strData.split('&');
+    var strData= request.url.substring(6,request.url.length)
+    var choices=strData.split('_');
     out='';
     for(var i=0;i<choices.length;i++){
-        out+=choices[i]+bigDatas[choices[i]];
+        out+=choices[i]+'='+bigDatas[choices[i]];
         if(i!=choices.length-1){
             out+=',';
         }
     }
-    response.writeHead(404);
+    //response.writeHead(404);
     response.end(out);
 });
-server.listen(8092, function() {
+server.listen(8094, function() {
     console.log((new Date()) + ' Server is listening on port 8080');
 });
 
@@ -124,7 +124,7 @@ wsServer.on('request', function(request) {
     });
 });
 
-http1.listen(3003, function(){
+http1.listen(3005, function(){
   console.log('listening on *:3001');
 });
 
