@@ -22,8 +22,7 @@ var server = http.createServer(function(request, response) {
     var choices=strData.split('&');
     out='';
     for(var i=0;i<choices.length;i++){
-        var parts=choices[i].split('=')
-        out+=parts[0]+'='+bigDatas[choices[i]];
+        out+=choices[i]+bigDatas[choices[i]];
         if(i!=choices.length-1){
             out+=',';
         }
