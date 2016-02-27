@@ -2,6 +2,10 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 var Forecast = require('forecast.io');
+var app = require('express')();
+var http1 = require('http').Server(app);
+var io = require('socket.io')(http1);
+var express = require('express');
 
 var bigDatas = new Array();
 
@@ -16,7 +20,7 @@ var server = http.createServer(function(request, response) {
     response.writeHead(404);
     response.end();
 });
-server.listen(8090, function() {
+server.listen(8091, function() {
     console.log((new Date()) + ' Server is listening on port 8080');
 });
 
@@ -35,6 +39,33 @@ function originIsAllowed(origin) {
   return true;
 }
  
+io.on('connection', function(socket){
+   console.log('connection');
+  socket.on('CH01', function (goodMess) {
+    var strData= goodMess.substring(4,goodMess.length)
+    var choice=goodMess.substring(0,3);
+    if(choice=='kin'){
+        var datas=strData.split(',');
+        for(var i=0;i<datas.length;i++){
+            var parts=datas[i].split(':');
+            bigDatas[parts[0]]=parts[1];
+        }
+        socket.emit('Success');
+    }
+    else if(choice=='web'){
+        var choices=strData.split(',');
+        out='';
+        for(var i=0;i<choices.length;i++){
+            out+=choices[i]+':'+bigDatas[choices[i]];
+            if(i!=choices.length-1){
+                out+=',';
+            }
+        }
+        socket.emit(out);
+    }
+  });
+});
+
 wsServer.on('request', function(request) {
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin 
@@ -79,6 +110,10 @@ wsServer.on('request', function(request) {
     connection.on('close', function(reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
+});
+
+http1.listen(3002, function(){
+  console.log('listening on *:3001');
 });
 
 forecast.get(34.137260, -118.128216, function (err, res, data) {
