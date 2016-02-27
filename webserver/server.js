@@ -1,14 +1,11 @@
 #!/usr/bin/env node
-var WebSocketServer = require('websocket').server;
 var http = require('http');
 var Forecast = require('forecast.io');
 var app = require('express')();
 var http1 = require('http').Server(app);
 var io = require('socket.io')(http1);
-var express = require('express');
-var dispatcher = require('httpdispatcher');
 
-var PORT=3005;
+var PORT=3006;
 
 var bigDatas = new Array();
 
