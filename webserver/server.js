@@ -76,7 +76,7 @@ forecast.get(34.137260, -118.128216, function (err, res, data) {
     if (err) console.log("timeout");
     //console.log('res: ' + res);
     //console.log('data: ' + data);
-    bigDatas['forcast']=data["currently"]["summary"];
+    bigDatas['weather']=data["currently"]["summary"];
     console.log(data["currently"]["summary"]);
 });
 
@@ -97,7 +97,7 @@ http.get({
         //console.log(table);
         var out='(';
         for(var i=0;i<table.length;i++){
-            out+=table[i]['symbol']+','+table[i]['Ask']+','+table[i]['ChangeinPercent']+';'
+            out+=table[i]['symbol']+'_'+table[i]['Ask']+'_'+table[i]['ChangeinPercent']+';'
         }
         out+=')';
         bigDatas['stock']=out;
@@ -111,7 +111,7 @@ var wait = setInterval(function() {
         if (err) console.log("timeout");
         //console.log('res: ' + res);
         //console.log('data: ' + data);
-        bigDatas['forcast']=data["currently"]["summary"];
+        bigDatas['weather']=data["currently"]["summary"];
         console.log(data["currently"]["summary"]);
     });
     http.get({
@@ -129,7 +129,7 @@ var wait = setInterval(function() {
             //console.log(table);
             var out='(';
             for(var i=0;i<table.length;i++){
-                out+=table[i]['symbol']+','+table[i]['Ask']+','+table[i]['ChangeinPercent']+';'
+                out+=table[i]['symbol']+'_'+table[i]['Ask']+'_'+table[i]['ChangeinPercent']+';'
             }
             out+=')';
             bigDatas['stock']=out;
