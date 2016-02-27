@@ -40,10 +40,11 @@ function originIsAllowed(origin) {
 }
  
 io.on('connection', function(socket){
-   console.log('connection');
-  socket.on('CH01', function (goodMess) {
+    console.log('connection');
+    socket.on('CH01', function (goodMess) {
     var strData= goodMess.substring(4,goodMess.length)
     var choice=goodMess.substring(0,3);
+    console.log("Recieved:"+goodMess);
     if(choice=='kin'){
         var datas=strData.split(',');
         for(var i=0;i<datas.length;i++){
@@ -121,7 +122,7 @@ forecast.get(34.137260, -118.128216, function (err, res, data) {
     if (err) console.log("timeout");
     //console.log('res: ' + res);
     //console.log('data: ' + data);
-    bigDatas['forcast']=["currently"]["summary"];
+    bigDatas['forcast']=data["currently"]["summary"];
     console.log(data["currently"]["summary"]);
 });
 
@@ -131,7 +132,7 @@ var wait = setInterval(function() {
         if (err) console.log("timeout");
         //console.log('res: ' + res);
         //console.log('data: ' + data);
-        bigDatas['forcast']=["currently"]["summary"];
+        bigDatas['forcast']=data["currently"]["summary"];
         console.log(data["currently"]["summary"]);
     });
 }, 180000); // retry every 3 mins
