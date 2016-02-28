@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4",
+    "fb": "^1.0.2",
     "forecast.io": "0.0.9",
     "forecastio": "^1.0.1",
+    "imessage": "^0.1.5",
     "socketio": "^1.0.0"
   }
 }
