@@ -77,6 +77,7 @@ forecast.get(34.137260, -118.128216, function (err, res, data) {
     //console.log('res: ' + res);
     //console.log('data: ' + data);
     bigDatas['weather']=data["currently"]["summary"];
+    bigDatas['temp']=data["currently"]["temperature"];
     console.log(data["currently"]["summary"]);
 });
 
@@ -94,6 +95,7 @@ http.get({
         // Data reception is done, do whatever with it!
         var parsed = JSON.parse(body);
         var table=parsed['query']['results']['quote'];
+
         //console.log(table);
         var out='(';
         for(var i=0;i<table.length;i++){
@@ -112,6 +114,7 @@ var wait = setInterval(function() {
         //console.log('res: ' + res);
         //console.log('data: ' + data);
         bigDatas['weather']=data["currently"]["summary"];
+        bigDatas['temp']=data["currently"]["temperature"];
         console.log(data["currently"]["summary"]);
     });
     http.get({
