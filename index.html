@@ -46,6 +46,7 @@
 			left: 200px;
 		}
 
+
 		#wiz{
 			z-index: 400;
 			margin-left: 300%;
@@ -252,6 +253,10 @@
 			font-size: 2em;
 		 }
 
+		 
+
+		 
+
 
 
 	</style>
@@ -285,11 +290,13 @@
 
 		var currentVoice;
 
+		var currentText;
+
 		function onLoad() {
 			
 			//var socket = io('http://172.20.10.12:3003');
-			var socket = io('http://172.20.10.2:3006');
-			socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,stock,dummy');
+			var socket = io('http://172.20.10.3:3006');
+			socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,mess,time,stock,dummy');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -361,9 +368,51 @@
 							}
 							currentVoice = "stop";
 						}
+						if (command == "weather"){
+							if (currentVoice!="weather"){
+								weatherAnimation();
+								setTimeout(weatherBack, 3000);
+							}
+							currentVoice = "weather";
+						}
+						if (command == "stock"){
+							if (currentVoice!="stock"){
+								stockAnimation();
+								setTimeout(stockBack, 3000);
+							}
+							currentVoice = "stock";
+						}
+						if (command == "time"){
+							if (currentVoice!="time"){
+								timeAnimation();
+								setTimeout(timeBack, 3000);
+							}
+							currentVoice = "time";
+						}
+						if (command == "beat"){
+							if (currentVoice!="beat"){
+								heartAnimation();
+								setTimeout(heartBack, 3000);
+							}
+							currentVoice = "beat";
+						}
+
 						
 					}
-					else if (i==9) { //stock
+					else if (i==9) { //mess/tim
+						var mes = json[9].substring(5, len);
+						var tim = json[10].substring(5, len);
+						if (mes!="undefined" && tim!="undefined") {
+							//updateStock(stock);
+							if (mes != currentText){
+								currentText = mes;
+								updateText(tim, mes);
+							}
+							
+							//updateText(tim, mes);
+						}
+					}	
+					else if (i==11) { //stock
 						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
 							updateStock(stock);
@@ -372,7 +421,7 @@
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,stock,dummy');
+  					socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,mess,time,stock,dummy');
 
 				}, 300); 
 				
@@ -395,10 +444,43 @@
 			sager.style.visibility = "hidden";
 
 			//playEqualizer();
+			//timeAnimation();
+			//stockAnimation();
+			//setTimeout(stockBack, 3000);
+			//setTimeout(timeBack, 3000);
+			//timeBack();
+			//weatherAnimation();
+			//setTimeout(weatherBack, 3000);
 
-			
+			//heartAnimation();
+			//setTimeout(heartBack, 3000);
 			
 
+
+		}
+
+		function convertTime(time){
+			/*
+			var cheng = "";
+
+			var minutes = 1000 * 60;
+			var hours = minutes * 60;
+			var days = hours * 24;
+			var years = days * 365;
+			var d = new Date();
+			var t = time;
+
+			var h = Math.round(t / hours);
+			var m = Math.round(t / minutes);
+
+			cheng += (h + ":");
+			cheng += m;
+			return cheng;
+			*/
+
+			var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+			d.setUTCSeconds(time);
+			return d;
 
 		}
 
@@ -418,6 +500,21 @@
 				//$('#flame').css({'marginLeft':'299%'});
 			}
 			setTimeout("updateHat()",300);
+		}
+
+		function updateText(time, text){
+			var ziran = convertTime(time);
+			var result =  ziran + text;
+			var image = document.createElement('li');
+			image.setAttribute('class', 'message-list');
+			image.style.fontSize = "2em";
+			image.innerHTML = result;
+
+			//var table = document.getElementsByClassName("list-group-item");
+			var table = document.getElementById("samp");
+			table.appendChild(image);
+
+
 		}
 
 		function updateRain(){
@@ -561,7 +658,122 @@
 			        easing: Y.Easing.backBoth
 			    });
 
-	        	anim.set('to', { xy: [1450, 200] });
+	        	anim.set('to', { xy: [1100, 300] });
+	        	anim.run();
+			});
+		}
+
+		function timeAnimation(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#time' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [500, 300] });
+	        	anim.run();
+			});
+			document.getElementById("time").style.fontSize = "5em";
+		}
+
+		function timeBack(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#time' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [1100, 0] });
+	        	anim.run();
+			});
+			document.getElementById("time").style.fontSize = "3em";
+		}
+
+		function stockAnimation(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#stocks' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [500, 300] });
+	        	anim.run();
+			});
+			
+		}
+
+		function stockBack(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#stocks' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [1000, 100] });
+	        	anim.run();
+			});
+		}
+
+		function weatherAnimation(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#weather' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [500, 100] });
+	        	anim.run();
+			});
+		}
+
+		function weatherBack(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#weather' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [0, 0] });
+	        	anim.run();
+			});
+		}
+
+		function heartAnimation(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#heartbeat' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [500, 100] });
+	        	anim.run();
+			});
+		}
+
+		function heartBack(){
+			YUI().use('anim', function(Y) {
+
+			    var anim = new Y.Anim({
+			        node: '#heartbeat' ,
+			        duration: 2.0,
+			        easing: Y.Easing.easeIn
+			    });
+
+	        	anim.set('to', { xy: [0, 350] });
 	        	anim.run();
 			});
 		}
@@ -646,7 +858,14 @@
 				</ul>
 			</div>
 			</p><center>
+			<div id = "messages">
+				<ul id="samp" class="list-group-item">
+					
+
+				</ul>
+			</div>
 		</div>
+
 
 </body>
 
