@@ -5,6 +5,8 @@ var app = require('express')();
 var http1 = require('http').Server(app);
 var io = require('socket.io')(http1);
 
+const listenForMessages = require('./messages');
+
 var PORT=3007;
 
 var bigDatas = new Array();
@@ -17,6 +19,13 @@ forecast = new Forecast(options);
  
 io.on('connection', function(socket){
     console.log('connection');
+		
+		listenForMessages(function (text) {
+			socket.emit('message', JSON.stringify({
+				text: text
+			}));
+		});
+
     socket.on('CH01', function (goodMess) {
     var strData= goodMess.substring(4,goodMess.length)
     var choice=goodMess.substring(0,3);
