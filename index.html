@@ -237,6 +237,7 @@
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
+				updateTime();
 				var json = data.split(",");
 				console.log("First element is: " + json[0]);
 				for (var i = 0; i< json.length; i++) {
@@ -254,7 +255,6 @@
 						
 						var temperature = json[i].substring(5,len);
 						if (temperature!="undefined") {
-							console.log("attempting to update temperature");
 							document.getElementById("temperature").innerHTML = Math.round(temperature);
 
 						}
@@ -293,14 +293,26 @@
 
 		function updateTime() {
 			var d = new Date();
-			d.getHours(); // => 9
-			d.getMinutes(); // =>  30
-			d.getSeconds(); // => 51
+			var hours = d.getHours(); // => 9
+			var min = d.getMinutes(); // =>  30
+			var part = "AM";
 			//document.getElementById("").innerHTML = "";
-		}
-
-		function updateTemp() {
-
+			if (hours<=12) {
+				part = "AM";
+				if (hours<10) {
+					hours = "0"+hours;
+				}
+			}
+			else {
+				part = "PM";
+				hours = hours-12;
+			}
+			if (min<=12) {
+				if (min<10) {
+					min = "0"+min;
+				}
+			}
+			document.getElementById("time").innerHTML = hours+":"+min+" "+part;
 		}
 
 		function updateWeather(weather) {
@@ -365,10 +377,6 @@
 
 
 	</script>
-
-	
-
-
 </head>
 
 <body onload="onLoad()">
@@ -398,9 +406,11 @@
 			</div>
 		</div>
 		<div id="right">
+			<center> <p>
 			<div id= "time">
-				<center> <p> 8:56 PM </p> </center>
+				8:56 PM
 			</div>
+			</p><center>
 		</div>
 	</div>
 
