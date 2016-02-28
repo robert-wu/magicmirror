@@ -25,7 +25,21 @@
 			bottom:0;
 		}
 
+		#mirror{
+			top: 30%;
+			z-index: 0;
+			width: 100%;
+			position: absolute;
+		}
+
 		#flame{
+			z-index: 300;
+			top:0;
+			margin-left: 300%;
+			margin-top: 50%;
+		}
+
+		#colorful{
 			z-index: 300;
 			top:0;
 			margin-left: 300%;
@@ -41,6 +55,8 @@
 			bottom:0;
 		
 		}
+
+
 
 		#left {
 			float: left;
@@ -87,7 +103,7 @@
 		}
 
 		#weather img {
-			width: 50%;
+			width: 75%;
 		}
 
 		#flame{
@@ -217,8 +233,14 @@
 		   transform: scale(1);
 		 }
 
+		 #time {
+		 	height: 30%;
+		 }
 
-
+		 #stocks {
+			height: 30%;
+			font-size: 2em;
+		 }
 
 
 
@@ -231,16 +253,23 @@
 	<script>
 
 		var temp = 00;
+		var oldlx=0;
+		var oldly=0;
+		var lx=0;
+		var ly=0;
+		var oldmx=0;
+		var oldmy=0;
+		var mx=0;
+		var my=0;
+		var countFlame=0;
+		var countRainbow=0;
+		var vid;
 
 		function onLoad() {
-			//update time
-			//update weather
-			//update heart beat
-			//load text messages
-			//searching for voice symbol
+			
 			//var socket = io('http://172.20.10.12:3003');
 			var socket = io('http://172.20.10.2:3006');
-			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
+			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,voice,stock,dummy');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -282,21 +311,73 @@
 						}
 
 					}
-					else if (i==5) { //stock
+					else if (i==5) { //mouthrightx and mouthrighty skip 5
+						if (json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined") {
+							var mx = parseFloat(json[5].substring(12,len));
+							var my = parseFloat(json[6].substring(12,len));
+						}
+					}
+
+					else if (i==7) {
+						var command = json[i].substring(6,len);
+						if (command == "trump") {
+							playMirror();
+						}
+						
+					}
+
+					else if (i==8) { //stock
 						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
 							updateStock(stock);
 						}
 					}
+
+					
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
-				}, 500); 
+  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,voice,stock,dummy');
+				}, 200); 
 				
 			});
-		}
+		
 
+		setTimeout(function(){
+				//your code to be executed after 1 seconds
+				if(lx!=oldlx || ly!=oldly){
+					document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
+					$('#flame').css('margin-left',(75+300.*(lx-.5))+'%');
+					$('#flame').css('margin-top',(50+300.*(.5-ly))+'%');
+					oldlx=lx;
+					oldly=ly+Math.random()/20;
+					countFlame++;
+					console.log(countFlame+(50+200*(lx-.5))+'%'+(50+200.*(ly-.5))+'%'+lx+ly);
+				}
+				else{
+					$('#flame').css('margin-left','299%');
+				}
+			}, 100); 
+			setTimeout(function(){
+				//your code to be executed after 1 seconds
+				if(mx!=oldmx || my!=oldmy){
+					document.getElementById("rainbow").src = './images/rainbow' + (countRainbow%7+1) + '.png';
+					$('#colorful').css('margin-left',((50+300.*(mx-256)/512)+'%'));
+					$('#colorful').css('margin-top',((50+300.*(211-my)/422)+'%')) ;
+					oldmx=mx;
+					oldmy=my+Math.random()*15;
+					countRainbow++;
+					console.log(countFlame+(50+300.*(mx-256)/512)+'%'+(50+300.*(211-my)/422)+'%'+mx+my);
+				}
+				else{
+					$('#flame').css('margin-left','299%');
+				}
+			}, 100);
+
+			vid = document.getElementById("Ben10");
+			
+			vid.style.visibility = "hidden"; 
+		}
 		function updateTime() {
 			var d = new Date();
 			var hours = d.getHours(); // => 9
@@ -352,17 +433,19 @@
 		}
 
 		function updateStock(stock) {
+			if (stock !="undefined"){
 			var stock1 = stock.split("(");
 			var stock2 = stock1[1].split(")");
 			var stockArray = stock2[0].split(";");
 			var stockDetailsGoog = stockArray[0].split("_");
-			var stockDetailsYhoo = stockArray[0].split("_");
-
+			var stockDetailsYhoo = stockArray[1].split("_");
+			var stockDetailsMsft = stockArray[2].split("_");
+			document.getElementById("stock1").innerHTML = stockDetailsGoog[2];
+			document.getElementById("stock2").innerHTML = stockDetailsYhoo[2];
+			document.getElementById("stock3").innerHTML = stockDetailsMsft[2];
 		}
 
-		var oldlx=0;
-		var oldly=0;
-		var countFlame=0;
+		}
 
 		function updateFlame(x,y){
 			if(x!=oldlx || y!=oldly){
@@ -379,14 +462,34 @@
 			}
 		}
 
+		function playMirror(){
+			vid.style.visibility = "visible";
+			vid.play();
+			setTimeout(hideMirror, 5000);
+
+		}
+
+		function hideMirror(){
+			vid.style.visibility = "hidden";
+		}
 
 	</script>
 </head>
 
 <body onload="onLoad()">
 	<div id="canvas"> 
+		<div id="mirror">
+			<center>
+			<video id="Ben10" width="400" height="300" controls>
+				<source src="video/mirrorVideo.mp4" type="video/mp4">
+			</video>
+			</center>
+		</div>
 		<div id="flame">
 			<img id="fire" src="images/fire1.jpg">
+		</div>
+		<div id="colorful">
+			<img id="rainbow" src="images/rainbow1.png">
 		</div>
 	</div>
 	<div id="overlay"> 
