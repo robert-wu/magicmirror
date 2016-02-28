@@ -120,13 +120,6 @@
 			width: 75%;
 		}
 
-		#flame{
-			z-index: 300;
-			top:0;
-			margin-left: 300%;
-			margin-top: 50%;
-		}
-
 		#temperature {
 			float: left;
 		}
@@ -279,6 +272,7 @@
 		var oldmy=0;
 		var mx=0;
 		var my=0;
+		var isOpen="closed";
 		var countFlame=0;
 		var countRainbow=0;
 		var vid;
@@ -292,7 +286,7 @@
 			
 			//var socket = io('http://172.20.10.12:3003');
 			var socket = io('http://172.20.10.2:3006');
-			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,voice,stock,dummy');
+			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,mouthState,voice,stock,dummy');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -335,13 +329,14 @@
 
 					}
 					else if (i==5) { //mouthrightx and mouthrighty skip 5
-						if (json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined") {
+						if (json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined") {
 							var mx = parseFloat(json[5].substring(12,len));
 							var my = parseFloat(json[6].substring(12,len));
+							var isOpen = parseFloat(json[7].substring(11,len));
 						}
 					}
 
-					else if (i==7) {
+					else if (i==8) {
 						var command = json[i].substring(6,len);
 						if (command == "trump") {
 							if (currentVoice!="trump"){
@@ -352,51 +347,57 @@
 						
 					}
 
-					else if (i==8) { //stock
+					else if (i==9) { //stock
 						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
 							updateStock(stock);
 						}
 					}
-
 					
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,voice,stock,dummy');
+  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,mouthState,voice,stock,dummy');
+
 				}, 200); 
 				
 			});
 		
 
-		setTimeout(function(){
+			setTimeout(function(){
 				//your code to be executed after 1 seconds
 				if(lx!=oldlx || ly!=oldly){
 					document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
-					$('#flame').css('margin-left',(75+300.*(lx-.5))+'%');
-					$('#flame').css('margin-top',(50+300.*(.5-ly))+'%');
+					//$('#flame').css({'marginLeft':((75+300.0*(lx-.5)).toString()+'%')});
+					//$('#flame').css({'marginTop':((50+300.0*(.5-ly)).toString()+'%')});
+					document.getElementById("flame").style.marginLeft=(75+300.0*(lx-.5)).toString()+'%';
+					document.getElementById("flame").style.marginTop=(50+300.0*(.5-ly)).toString()+'%';
 					oldlx=lx;
 					oldly=ly+Math.random()/20;
 					countFlame++;
 					console.log(countFlame+(50+200*(lx-.5))+'%'+(50+200.*(ly-.5))+'%'+lx+ly);
 				}
 				else{
-					$('#flame').css('margin-left','299%');
+					document.getElementById("flame").style.marginLeft='299%';
+					//$('#flame').css({'marginLeft':'299%'});
 				}
 			}, 100); 
 			setTimeout(function(){
 				//your code to be executed after 1 seconds
-				if(mx!=oldmx || my!=oldmy){
+				if(mx!=oldmx || my!=oldmy && isOpen=="Opened"){
 					document.getElementById("rainbow").src = './images/rainbow' + (countRainbow%7+1) + '.png';
-					$('#colorful').css('margin-left',((50+300.*(mx-256)/512)+'%'));
-					$('#colorful').css('margin-top',((50+300.*(211-my)/422)+'%')) ;
+					//$('#colorful').css({'marginLeft':((50+300.0*(mx-256)/512)+'%')});
+					//$('#colorful').css({'marginTop':((50+300.0*(211-my)/422)+'%')});
+					document.getElementById("colorful").style.marginLeft=(50+300.0*(mx-256)/512)+'%';
+					document.getElementById("colorful").style.marginTop=(50+300.0*(211-my)/422)+'%';
 					oldmx=mx;
 					oldmy=my+Math.random()*15;
 					countRainbow++;
 					console.log(countFlame+(50+300.*(mx-256)/512)+'%'+(50+300.*(211-my)/422)+'%'+mx+my);
 				}
 				else{
-					$('#flame').css('margin-left','299%');
+					//$('#colorful').css({'marginLeft':'299%'});
+					document.getElementById("colorful").style.marginLeft='299%';
 				}
 			}, 100);
 
