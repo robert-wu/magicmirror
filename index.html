@@ -2,6 +2,7 @@
 <head>
 	<title> Smart Mirror </title>
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 	<style>
 		body {
 			min-height:100%;
@@ -78,13 +79,6 @@
 			font-size: 3em;
 		}
 
-		#flame{
-			z-index: 300;
-			top:0;
-			margin-left: 300%;
-			margin-top: 50%;
-		}
-
 		#weather img {
 			width: 50%;
 		}
@@ -130,7 +124,6 @@
 			padding: 0;
 			margin: 0;
 		}
-
 
 		.pulse2 {
 			-webkit-animation: pulse2 1s linear infinite;
@@ -232,8 +225,8 @@
 			//load text messages
 			//searching for voice symbol
 			//var socket = io('http://172.20.10.12:3003');
-			var socket = io('http://172.20.10.2:3006');
-			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
+			var socket = io('http://localhost:3007');
+			socket.emit('CH02','web-weather,temp,beat,stock');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -266,27 +259,17 @@
 							document.getElementById("heartQuantity").innerHTML = beat;
 						}
 					}
-					else if (i==3) { //lefthandx and lefthandy skip 3
-						var lx = json[3].substring(10,len);
-						var ly = json[4].substring(11,len);
-						if (lx!="undefined" && ly!="undefined") {
-							console.log(lx+","+ly);
-							updateFlame(parseFloat(lx),parseFloat(ly));
-						}
-
-					}
-					else if (i==5) { //stock
-						var stock = json[i].substring(6,len)
+					else if (i==3) { //stock
+						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
-							console.log(stock);
-							updateStock();
+							updateStock(stock);
 						}
 					}
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
-				}, 200); 
+  					socket.emit('CH02','web-weather,temp,beat,stock');
+				}, 500); 
 				
 			});
 		}
@@ -345,34 +328,13 @@
 			}
 		}
 
-		function updateHeart() {
+		function updateStock(stock) {
+			var stock1 = stock.split("(");
+			var stock2 = stock1[1].split(")");
+			var stockArray = stock2[0].split(";");
+			var stockDetailsGoog = stockArray[0].split("_");
+			var stockDetailsYhoo = stockArray[0].split("_");
 
-		}
-
-		function updateStock() {
-
-		}
-
-		function updateArrow(){
-
-		}
-		var oldlx=0;
-		var oldly=0;
-		var countFlame=0;
-
-		function updateFlame(x,y){
-			if(x!=oldlx || y!=oldly){
-				document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
-				$('#flame').css('margin-left',(75+300*(x-.5))+'%');
-				$('#flame').css('margin-top',(50+300*(.5-y))+'%');
-				oldlx=x;
-				oldly=y;
-				countFlame++;
-				console.log(countFlame+(50+200*(x-.5))+'%'+(50+200*(y-.5))+'%'+x+y);
-			}
-			else{
-				$('#flame').css('margin-left','299%');
-			}
 		}
 
 
@@ -380,11 +342,7 @@
 </head>
 
 <body onload="onLoad()">
-	<div id="canvas">
-		<div id="flame">
-			<img id="fire" src="images/fire1.jpg">
-		</div>
-	</div>
+	<div id="canvas"> </div>
 	<div id="overlay"> 
 		<div id="left">
 			<!--<div id= "time">
@@ -410,9 +368,20 @@
 			<div id= "time">
 				8:56 PM
 			</div>
+			<div id = "stocks">
+				<ul class="list-group">
+				  <li class="list-group-item">
+				  	GOOG
+					<button type="button" class="btn btn-primary">Primary</button>
+				  </li>
+				  <li class="list-group-item">
+				  	YHOO
+				  	<button type="button" class="btn btn-primary">Primary</button>
+				  </li>
+				</ul>
+			</div>
 			</p><center>
 		</div>
-	</div>
 
 </body>
 
