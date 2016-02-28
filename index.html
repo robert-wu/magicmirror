@@ -25,6 +25,13 @@
 			bottom:0;
 		}
 
+		#flame{
+			z-index: 300;
+			top:0;
+			margin-left: 300%;
+			margin-top: 50%;
+		}
+
 		#overlay {
 			z-index: 100;
 			position:absolute;
@@ -81,6 +88,13 @@
 
 		#weather img {
 			width: 50%;
+		}
+
+		#flame{
+			z-index: 300;
+			top:0;
+			margin-left: 300%;
+			margin-top: 50%;
 		}
 
 		#temperature {
@@ -225,8 +239,8 @@
 			//load text messages
 			//searching for voice symbol
 			//var socket = io('http://172.20.10.12:3003');
-			var socket = io('http://localhost:3007');
-			socket.emit('CH02','web-weather,temp,beat,stock');
+			var socket = io('http://172.20.10.2:3006');
+			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -259,7 +273,16 @@
 							document.getElementById("heartQuantity").innerHTML = beat;
 						}
 					}
-					else if (i==3) { //stock
+					else if (i==3) { //lefthandx and lefthandy skip 3
+						var lx = json[3].substring(10,len);
+						var ly = json[4].substring(11,len);
+						if (lx!="undefined" && ly!="undefined") {
+							console.log(lx+","+ly);
+							updateFlame(parseFloat(lx),parseFloat(ly));
+						}
+
+					}
+					else if (i==5) { //stock
 						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
 							updateStock(stock);
@@ -268,7 +291,7 @@
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,stock');
+  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,stock');
 				}, 500); 
 				
 			});
@@ -337,17 +360,38 @@
 
 		}
 
+		var oldlx=0;
+		var oldly=0;
+		var countFlame=0;
+
+		function updateFlame(x,y){
+			if(x!=oldlx || y!=oldly){
+				document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
+				$('#flame').css('margin-left',(75+300*(x-.5))+'%');
+				$('#flame').css('margin-top',(50+300*(.5-y))+'%');
+				oldlx=x;
+				oldly=y;
+				countFlame++;
+				console.log(countFlame+(50+200*(x-.5))+'%'+(50+200*(y-.5))+'%'+x+y);
+			}
+			else{
+				$('#flame').css('margin-left','299%');
+			}
+		}
+
 
 	</script>
 </head>
 
 <body onload="onLoad()">
-	<div id="canvas"> </div>
+	<div id="canvas"> 
+		<div id="flame">
+			<img id="fire" src="images/fire1.jpg">
+		</div>
+	</div>
 	<div id="overlay"> 
 		<div id="left">
-			<!--<div id= "time">
-				<center> <p> 8:56 PM </p> </center>
-			</div> -->
+			
 			<div id="weather">
 				<center>
 				<img id="icon" src="drawables/rain.png">
@@ -372,11 +416,15 @@
 				<ul class="list-group">
 				  <li class="list-group-item">
 				  	GOOG
-					<button type="button" class="btn btn-primary">Primary</button>
+					<button id="stock1" type="button" class="btn btn-primary" style="background-color:black; border: black">Primary</button>
 				  </li>
 				  <li class="list-group-item">
 				  	YHOO
-				  	<button type="button" class="btn btn-primary">Primary</button>
+				  	<button id="stock2" type="button" class="btn btn-primary" style="background-color: black; border: black">Primary</button>
+				  </li>
+				  <li class="list-group-item">
+				  	MSFT
+				  	<button id="stock3" type="button" class="btn btn-primary" style="background-color: black; border: black">Primary</button>
 				  </li>
 				</ul>
 			</div>
