@@ -287,6 +287,7 @@
 		var equalizer;
 		var vold;
 		var sager;
+		var count = 0;
 
 		var currentVoice;
 
@@ -460,23 +461,7 @@
 		}
 
 		function convertTime(time){
-			/*
-			var cheng = "";
-
-			var minutes = 1000 * 60;
-			var hours = minutes * 60;
-			var days = hours * 24;
-			var years = days * 365;
-			var d = new Date();
-			var t = time;
-
-			var h = Math.round(t / hours);
-			var m = Math.round(t / minutes);
-
-			cheng += (h + ":");
-			cheng += m;
-			return cheng;
-			*/
+			
 
 			var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
 			d.setUTCSeconds(time);
@@ -503,8 +488,18 @@
 		}
 
 		function updateText(time, text){
-			var ziran = convertTime(time);
-			var result =  ziran + text;
+			count++;
+
+			var ziran = document.getElementById("time").innerHTML;
+
+
+			var wu = ziran.split(":");
+
+			//var punhani = wu[4].split(":");
+
+			var result =  ziran + " - "+ text;
+			//var result =  wu[4] + " - "+ text;
+			var image = document.createElement('li');
 			var image = document.createElement('li');
 			image.setAttribute('class', 'message-list');
 			image.style.fontSize = "2em";
@@ -512,8 +507,15 @@
 
 			//var table = document.getElementsByClassName("list-group-item");
 			var table = document.getElementById("samp");
-			table.appendChild(image);
+			//table.appendChild(image);
+			table.insertBefore(image, table.childNodes[0]);
 
+			if (count > 2){
+				count = 0;
+
+				table.removeChild(table.childNodes[table.childNodes.length - 1]);
+				
+			}
 
 		}
 
@@ -549,6 +551,9 @@
 				part = "AM";
 				if (hours<10) {
 					hours = "0"+hours;
+				}
+				if (hours == 12) {
+					part = "PM";
 				}
 			}
 			else {
