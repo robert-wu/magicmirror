@@ -349,16 +349,26 @@
 							}
 							currentVoice = "trump";
 						}
+						if (command == "play") {
+							if (currentVoice!="play"){
+								playEqualizer();
+							}
+							currentVoice = "play";
+						}
+						if (command == "stop") {
+							if (currentVoice!="stop"){
+								stopVideo();
+							}
+							currentVoice = "stop";
+						}
 						
 					}
-
 					else if (i==9) { //stock
 						var stock = json[i].substring(6, len);
 						if (stock!="undefined") {
 							updateStock(stock);
 						}
-					}
-					
+					}	
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
@@ -536,6 +546,7 @@
 
 		function stopVideo(){
 			equalizer.pause();
+			equalizer.currentTime = 0;
 			equalizer.style.visibility = "hidden";
 			stopMusic();
 		}
@@ -561,6 +572,7 @@
 
 		function stopMusic(){
 			sager.pause();
+			sager.currentTime = 0;
 		}
 
 
