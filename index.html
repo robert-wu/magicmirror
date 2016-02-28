@@ -25,11 +25,25 @@
 			bottom:0;
 		}
 
+		#character{
+			top: 0px;
+			left: 100px;
+			z-index: 1;
+			width: 70%;
+			position: absolute;
+		}
+
 		#mirror{
-			top: 30%;
+			top: 70%;
 			z-index: 0;
 			width: 100%;
 			position: absolute;
+		}
+
+		#equalizer{
+			position: absolute;
+			top: -50px;
+			left: 200px;
 		}
 
 		#flame{
@@ -250,6 +264,10 @@
 	<script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
 	
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+	<script src="js/hashtable.js"></script>
+	<script src="js/prototype.js" type="text/javascript"></script>
+	<script src="js/scriptaculous.js" type="text/javascript"></script>
+	<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
 	<script>
 
 		var temp = 00;
@@ -264,6 +282,11 @@
 		var countFlame=0;
 		var countRainbow=0;
 		var vid;
+		var equalizer;
+		var vold;
+		var sager;
+
+		var currentVoice;
 
 		function onLoad() {
 			
@@ -321,7 +344,10 @@
 					else if (i==7) {
 						var command = json[i].substring(6,len);
 						if (command == "trump") {
-							playMirror();
+							if (currentVoice!="trump"){
+								playMirror();
+							}
+							currentVoice = "trump";
 						}
 						
 					}
@@ -375,8 +401,23 @@
 			}, 100);
 
 			vid = document.getElementById("Ben10");
-			
 			vid.style.visibility = "hidden"; 
+
+			vold = document.getElementById("character");
+			vold.style.visibility = "hidden";
+
+			equalizer = document.getElementById("equalizer");
+			equalizer.style.visibility = "hidden";
+
+			sager = document.getElementById("payphone");
+			sager.style.visibility = "hidden";
+
+			//playEqualizer();
+
+			
+			
+
+
 		}
 		function updateTime() {
 			var d = new Date();
@@ -464,14 +505,67 @@
 
 		function playMirror(){
 			vid.style.visibility = "visible";
+
 			vid.play();
 			setTimeout(hideMirror, 5000);
 
 		}
 
 		function hideMirror(){
+			vid.pause();
 			vid.style.visibility = "hidden";
+			vold.style.visibility = "visible";
+			setTimeout(hideVolt, 3000);
 		}
+
+		function hideVolt(){
+			vold.style.visibility = "hidden";
+		}
+
+		
+
+		function playEqualizer(){
+			animation();
+			setTimeout(playMusic, 2000);
+			setTimeout(playVideo, 2000);
+		}
+
+		function playVideo(){
+			equalizer.play();
+		}
+
+		function stopVideo(){
+			equalizer.pause();
+			equalizer.style.visibility = "hidden";
+			stopMusic();
+		}
+
+		function animation(){
+			YUI().use('anim', function(Y) {
+
+				equalizer.style.visibility = "visible";
+			    var anim = new Y.Anim({
+			        node: '#equalizer' ,
+			        duration: 2.0,
+			        easing: Y.Easing.backBoth
+			    });
+
+	        	anim.set('to', { xy: [1450, 200] });
+	        	anim.run();
+			});
+		}
+
+		function playMusic(){
+			sager.play();
+		}
+
+		function stopMusic(){
+			sager.pause();
+		}
+
+
+
+
 
 	</script>
 </head>
@@ -483,6 +577,14 @@
 			<video id="Ben10" width="400" height="300" controls>
 				<source src="video/mirrorVideo.mp4" type="video/mp4">
 			</video>
+			<img id="character" src="images/voldemort.jpg"/>
+			<video id="equalizer" width="400" height="500" controls>
+				<source src="video/equalizer.mp4" type="video/mp4">
+			</video>
+			<audio id="payphone">
+				<source src="music/payphone.mp3" type="audio/mpeg">
+			</audio>
+
 			</center>
 		</div>
 		<div id="flame">
