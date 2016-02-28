@@ -46,18 +46,21 @@
 			left: 200px;
 		}
 
-		#flame{
-			z-index: 300;
-			top:0;
+		#wiz{
+			z-index: 400;
 			margin-left: 300%;
-			margin-top: 50%;
+			margin-bottom: -10%;
+		}
+
+		#hat{
+			width: 500px;
+			height: 400px;
 		}
 
 		#colorful{
 			z-index: 300;
-			top:0;
 			margin-left: 300%;
-			margin-top: 50%;
+			margin-bottom: -10%;
 		}
 
 		#overlay {
@@ -264,10 +267,10 @@
 	<script>
 
 		var temp = 00;
-		var oldlx=0;
-		var oldly=0;
-		var lx=0;
-		var ly=0;
+		var oldhx=0;
+		var oldhy=0;
+		var hx=0;
+		var hy=0;
 		var oldmx=0;
 		var oldmy=0;
 		var mx=0;
@@ -286,7 +289,7 @@
 			
 			//var socket = io('http://172.20.10.12:3003');
 			var socket = io('http://172.20.10.2:3006');
-			socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,mouthState,voice,stock,dummy');
+			socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,stock,dummy');
 			//var socket2 = io('http://172.20.10.12:3003')
 			socket.on('CH02', function (data) {
 				console.log(data);
@@ -319,20 +322,22 @@
 							document.getElementById("heartQuantity").innerHTML = beat;
 						}
 					}
-					else if (i==3) { //lefthandx and lefthandy skip 3
-						var lx = json[3].substring(10,len);
-						var ly = json[4].substring(11,len);
-						if (lx!="undefined" && ly!="undefined") {
-							console.log(lx+","+ly);
-							updateFlame(parseFloat(lx),parseFloat(ly));
+					else if (i==3) { //headx and heady skip 4
+						if (json[3].substring(6,len)!="undefined" && json[4].substring(6,len)!="undefined") {
+							
+							hx = parseFloat(json[3].substring(6,len));
+							hy = parseFloat(json[4].substring(6,len));
+							console.log(hx+",,"+hy);
+							//updateFlame(parseFloat(lx),parseFloat(ly));
 						}
 
 					}
-					else if (i==5) { //mouthrightx and mouthrighty skip 5
-						if (json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined" && json[5].substring(12,len)!="undefined") {
-							var mx = parseFloat(json[5].substring(12,len));
-							var my = parseFloat(json[6].substring(12,len));
-							var isOpen = parseFloat(json[7].substring(11,len));
+					else if (i==5) { //mouthrightx and mouthrighty skip 6/7
+						if (json[5].substring(12,len)!="undefined" && json[6].substring(12,len)!="undefined" && json[7].substring(11,len)!="undefined") {
+							mx = parseFloat(json[5].substring(12,len));
+							my = parseFloat(json[6].substring(12,len));
+							isOpen = json[7].substring(11,len);
+							console.log(mx+",,,"+my+',,,'+isOpen);
 						}
 					}
 
@@ -357,49 +362,15 @@
 				}
 				setTimeout(function(){
   					//your code to be executed after 1 seconds
-  					socket.emit('CH02','web-weather,temp,beat,lefthandx,lefthandy,mouthRightx,mouthRighty,mouthState,voice,stock,dummy');
+  					socket.emit('CH02','web-weather,temp,beat,headx,heady,mouthRightX,mouthRightY,mouthState,voice,stock,dummy');
 
-				}, 200); 
+				}, 300); 
 				
 			});
-		
 
-			setTimeout(function(){
-				//your code to be executed after 1 seconds
-				if(lx!=oldlx || ly!=oldly){
-					document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
-					//$('#flame').css({'marginLeft':((75+300.0*(lx-.5)).toString()+'%')});
-					//$('#flame').css({'marginTop':((50+300.0*(.5-ly)).toString()+'%')});
-					document.getElementById("flame").style.marginLeft=(75+300.0*(lx-.5)).toString()+'%';
-					document.getElementById("flame").style.marginTop=(50+300.0*(.5-ly)).toString()+'%';
-					oldlx=lx;
-					oldly=ly+Math.random()/20;
-					countFlame++;
-					console.log(countFlame+(50+200*(lx-.5))+'%'+(50+200.*(ly-.5))+'%'+lx+ly);
-				}
-				else{
-					document.getElementById("flame").style.marginLeft='299%';
-					//$('#flame').css({'marginLeft':'299%'});
-				}
-			}, 100); 
-			setTimeout(function(){
-				//your code to be executed after 1 seconds
-				if(mx!=oldmx || my!=oldmy && isOpen=="Opened"){
-					document.getElementById("rainbow").src = './images/rainbow' + (countRainbow%7+1) + '.png';
-					//$('#colorful').css({'marginLeft':((50+300.0*(mx-256)/512)+'%')});
-					//$('#colorful').css({'marginTop':((50+300.0*(211-my)/422)+'%')});
-					document.getElementById("colorful").style.marginLeft=(50+300.0*(mx-256)/512)+'%';
-					document.getElementById("colorful").style.marginTop=(50+300.0*(211-my)/422)+'%';
-					oldmx=mx;
-					oldmy=my+Math.random()*15;
-					countRainbow++;
-					console.log(countFlame+(50+300.*(mx-256)/512)+'%'+(50+300.*(211-my)/422)+'%'+mx+my);
-				}
-				else{
-					//$('#colorful').css({'marginLeft':'299%'});
-					document.getElementById("colorful").style.marginLeft='299%';
-				}
-			}, 100);
+			updateHat();
+
+			updateRain();
 
 			vid = document.getElementById("Ben10");
 			vid.style.visibility = "hidden"; 
@@ -420,6 +391,47 @@
 
 
 		}
+
+		function updateHat(){
+			console.log('hat'+hx+','+hy);
+			if(hx!=oldhx || hy!=oldhy){
+				//$('#flame').css({'marginLeft':((75+300.0*(lx-.5)).toString()+'%')});
+				//$('#flame').css({'marginTop':((50+300.0*(.5-ly)).toString()+'%')});
+				document.getElementById("wiz").style.marginLeft=(40+300.0*(hx-256.0)/512)+'%';
+				document.getElementById("wiz").style.marginBottom=(-30+300.0*(211.0-hy)/422.0)+'%';
+				oldhx=hx+Math.random()*15;
+				oldhy=hy+Math.random()*15;
+				console.log('hatout'+(.2+(-30+300.0*(211.0-hy)/422.0))+'%');
+			}
+			else{
+				document.getElementById("wiz").style.marginLeft='299%';
+				//$('#flame').css({'marginLeft':'299%'});
+			}
+			setTimeout("updateHat()",300);
+		}
+
+		function updateRain(){
+			console.log('rainbow'+mx+','+my);
+			if((mx!=oldmx || my!=oldmy) && isOpen=="Opened"){
+				document.getElementById("rainbow").src = './images/rainbow' + (countRainbow%7+1) + '.png';
+				//$('#colorful').css({'marginLeft':((50+300.0*(mx-256)/512)+'%')});
+				//$('#colorful').css({'marginTop':((50+300.0*(211-my)/422)+'%')});
+				document.getElementById("colorful").style.marginLeft=(40+300.0*(mx-256.0)/512)+'%';
+				var bot=((-30+300.0*(211.0-my)/422.0))+'%';
+				console.log("Bot"+bot);
+				document.getElementById("colorful").style.marginBottom=bot;
+				oldmx=mx+Math.random()*15;
+				oldmy=my+Math.random()*15;
+				countRainbow++;
+				console.log('rainout'+bot);
+			}
+			else{
+				//$('#colorful').css({'marginLeft':'299%'});
+				document.getElementById("colorful").style.marginLeft='299%';
+			}
+			setTimeout("updateRain()",300);
+		}
+
 		function updateTime() {
 			var d = new Date();
 			var hours = d.getHours(); // => 9
@@ -489,20 +501,7 @@
 
 		}
 
-		function updateFlame(x,y){
-			if(x!=oldlx || y!=oldly){
-				document.getElementById("fire").src = './images/fire' + (countFlame%5+1) + '.jpg';
-				$('#flame').css('margin-left',(75+300*(x-.5))+'%');
-				$('#flame').css('margin-top',(50+300*(.5-y))+'%');
-				oldlx=x;
-				oldly=y;
-				countFlame++;
-				console.log(countFlame+(50+200*(x-.5))+'%'+(50+200*(y-.5))+'%'+x+y);
-			}
-			else{
-				$('#flame').css('margin-left','299%');
-			}
-		}
+	
 
 		function playMirror(){
 			vid.style.visibility = "visible";
@@ -588,8 +587,8 @@
 
 			</center>
 		</div>
-		<div id="flame">
-			<img id="fire" src="images/fire1.jpg">
+		<div id="wiz">
+			<img id="hat" src="images/michael.png">
 		</div>
 		<div id="colorful">
 			<img id="rainbow" src="images/rainbow1.png">
